@@ -4,6 +4,7 @@ app.controller('mainCtrl', function($scope, itunesService){
   //This is setting up the default behavior of our ng-grid. The important thing to note is
   //the 'data' property. The value is 'songData'. That means ng-grid is looking for songData on $scope and is putting whatever songData is into the grid.
   //this means when you make your iTunes request, you'll need to get back the information, parse it accordingly, then set it to songData on the scope -> $scope.songData = ...
+
   $scope.gridOptions = { 
       data: 'songData',
       height: '110px',
@@ -22,16 +23,35 @@ app.controller('mainCtrl', function($scope, itunesService){
 
   //First inject itunesService into your controller.
 
-    //code here
 
 
   //Now write a function that will call the method on the itunesService that is responsible for getting the data from iTunes, whenever the user clicks the submit button
   //*remember, that method should be expecting an artist name. The artist name is coming from the input box on index.html, head over there and check if that input box is tied to any specific model we could use.
   //Also note that that method should be retuning a promise, so you could use .then in this function.
     
-    //Code here
+    $scope.getSongData = function() {
 
+      itunesService.getMusic($scope.artist).then(function(data){
+        var myFinalArray = [];
+        var Info = function(Artist, Collection, AlbumArt, Type, CollectionPrice, Play, Song){
+            this.Artist = Artist;
+            this.Collection = Collection;
+            this.AlbumArt = AlbumArt;
+            this.Type = Type;
+            this.CollectionPrice = CollectionPrice;
+            this.Play = Play;
+            this.Song = Song;
+        }
+        for (var i = 0; i < data.length; i++) {
+          var information = new Info(data[i].artistName, data[i].collectionName, data[i].artworkUrl100, data[i].kind, data[i].collectionPrice, data[i].previewUrl, data[i].trackName)
+          myFinalArray.push(information)
+          information = null
+        }
+        $scope.songData = myFinalArray
+      })
+  };
 
+  $scope.options = ['Artist', 'Collection', 'Type', 'Price', 'Song'];
   //Check that the above method is working by entering a name into the input field on your web app, and then console.log the result
 
     //Code here
